@@ -1,0 +1,15 @@
+.access-form__register-message {
+    display: flex;
+    margin-top: 15px;
+}
+.access-form__register-messagetext {
+    margin: 0 5px 0;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+    text-align: center;
+    color: #FFFFFF;
+}
+
+
+
