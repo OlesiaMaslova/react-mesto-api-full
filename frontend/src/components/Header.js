@@ -1,13 +1,13 @@
 import { BrowserRouter, Link, Route } from 'react-router-dom';
 
 
-function Header({ userData, onLogout }) {
+function Header({ userData, onLogout, isLoggedIn }) {
     return (
         <header className="header">
             <div className="header__logo"></div>
             <Route exact path="/">
                 <div className="header__navbar">
-                    <p className="header__email">{userData.email}</p>
+                    <p className="header__email">{isLoggedIn? userData.email : ''}</p>
                     <button className="header__button" onClick={() => { onLogout() }}>Выйти</button>
                 </div>
             </Route>

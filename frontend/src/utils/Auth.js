@@ -1,4 +1,4 @@
-export const URL = 'http://mesto90back.nomoredomains.sbs';
+export const URL = 'https://mesto90back.nomoredomains.sbs';
 
 const headers = {
     'Accept': 'application/json',

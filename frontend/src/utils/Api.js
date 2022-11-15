@@ -1,3 +1,5 @@
+
+
 class Api {
     constructor(url, headers) { 
         this._url = url;
@@ -81,7 +83,9 @@ class Api {
 
 }
 
-export const api = new Api('http://mesto90back.nomoredomains.sbs', {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${localStorage.token}`,
-});
+export default Api;
+
+// export const api = new Api('http://mesto90back.nomoredomains.sbs', {
+//     'Content-Type': 'application/json',
+//     'Authorization': `Bearer ${localStorage.token}`,
+// });

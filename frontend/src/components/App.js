@@ -7,7 +7,7 @@ import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
-import { api } from '../utils/Api.js';
+import Api from '../utils/Api.js';
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddNewCardPopup from "./AddNewCardPopup";
 import Login from "./Login";
@@ -17,6 +17,7 @@ import { Route, Switch, Redirect, useHistory, useLocation } from 'react-router-d
 import ProtectedRoute from "./ProtectedRoute";
 import * as auth from "../utils/Auth.js";
 import { isLabelWithInternallyDisabledControl } from "@testing-library/user-event/dist/utils";
+
 
 
 function App() {
@@ -37,9 +38,12 @@ function App() {
     });
     const history = useHistory();
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    const location = useLocation();
-
-
+    const [tokenAuth, setTokenAuth] = React.useState({ token: ''});
+    
+    const api = new Api('https://mesto90back.nomoredomains.sbs', {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${tokenAuth.token}`,
+});
     function handleEditAvatarClick() {
         setEditAvatarPopupOpen(true);
     }
@@ -109,6 +113,9 @@ function App() {
 
 
     React.useEffect(() => {
+        if(!isLoggedIn) {
+            return
+        }
         api.getUserInfo()
             .then((data) => {
                 setCurrentUser(data);
@@ -116,7 +123,7 @@ function App() {
             .catch((err) => {
                 console.log(`Ошибка: ${err}`);
             })
-    }, [])
+    }, [isLoggedIn])
 
     const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || selectedCard.link
 
@@ -159,7 +166,9 @@ function App() {
     }
 
     React.useEffect(() => {
-
+        if(!isLoggedIn) {
+            return
+        }
         api.getInitialCards()
             .then((data) => {
                 setCards(data);
@@ -168,18 +177,19 @@ function App() {
                 console.log(`Ошибка: ${err}`);
             })
 
-    }, [])
+    }, [isLoggedIn])
 
     React.useEffect(() => {
         if (isLoggedIn) {
             history.push('/');
         }
-    }, [isLoggedIn]);
+    }, [isLoggedIn, history]);
+
 
     React.useEffect(() => {
         getTokenChecked();
-    }, []);
 
+    }, []);
     function getTokenChecked() {
         const jwt = localStorage.getItem('token');
         if (!jwt) {
@@ -188,26 +198,27 @@ function App() {
         auth.checkToken(jwt)
             .then((data) => {
                 setIsLoggedIn(true);
-                setUserData(data.email);
+                setTokenAuth({token:jwt})
+                setUserData(data)
             })
             .catch((err) => {
                 console.log(err);
             })
 
     }
-
+    
     function onLogin(data) {
         return auth.authorize(data)
             .then(({ token }) => {
                 setIsLoggedIn(true);
                 setUserData(data)
                 localStorage.setItem('token', token);
+                setTokenAuth({token: token});
             })
             .catch((err) => {
                 console.log(err);
             })
     }
-
     function onLogout() {
         setIsLoggedIn(false);
         localStorage.removeItem('token');
@@ -234,13 +245,12 @@ function App() {
 
 
 
-
     return (
 
         <div className="App">
             <CurrentUserContext.Provider value={currentUser}>
 
-                <Header userData={userData} onLogout={onLogout}/>
+                <Header userData={userData} isLoggedIn = {isLoggedIn} onLogout={onLogout}/>
                 <Switch>
                     <ProtectedRoute
                         exact path="/"

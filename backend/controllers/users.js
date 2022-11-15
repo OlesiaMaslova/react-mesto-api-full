@@ -1,8 +1,11 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable no-unused-vars */
+/* eslint-disable indent */
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { OK } = require('../utils');
-const { JWT_SECRET } = require('../config');
+const { JWT_SECRET, NODE_ENV } = require('../config');
 const AuthError = require('../errors/AuthError');
 const BadRequestError = require('../errors/BadRequestError');
 const DuplicatedValueError = require('../errors/DuplicatedValueError');
@@ -65,7 +68,7 @@ async function login(req, res, next) {
     if (!isMatched) {
       return next(new AuthError('Неверные почта или пароль'));
     }
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key', { expiresIn: '7d' });
     if (!token) {
       return next(new AuthError('Некорректный токен'));
     }
